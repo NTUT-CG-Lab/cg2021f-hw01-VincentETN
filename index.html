@@ -18,7 +18,7 @@
 		
 		<script>
 		
-			var fontttf = "./kaiu.ttf";
+			var fontttf = "./I.Ngaan.ttf";
 			
 			let container;
 			let camera, cameraTarget, scene, renderer;
@@ -26,15 +26,20 @@
 			let firstLetter = true;
 
 			let text = '高等計算機圖學作業';
-			const height = 20,
-				size = 70,
-				hover = 30,
+			const height = 5,
+				size = 32,
+				hover = 0,
 				curveSegments = 4,
 				bevelThickness = 2,
 				bevelSize = 1.5;
+//clock
+			let hoursGeo, hoursMesh, clockMaterial;
+			const hours = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+			const hoursX = [0, 1, 1.732, 2, 1.732, 1, 0, -1, -1.732, -2, -1.732, -1];
+			const hoursY = [2, 1.732, 1, 0, -1, -1.732, -2, -1.732, -1, 0, 1, 1.732];
 
 			let font = null;
-			const mirror = true;
+			const mirror = false;
 
 			let targetRotation = 0;
 			let targetRotationOnPointerDown = 0;
@@ -72,11 +77,13 @@
 				scene.add( dirLight );
 
 				const pointLight = new THREE.PointLight( 0xffffff, 1.5 );
-				pointLight.position.set( 0, 100, 90 );
-				pointLight.color.setHSL( Math.random(), 1, 0.5 );
+				pointLight.position.set( 0, 120, 150 );
+				//pointLight.color.setHSL( Math.random(), 1, 0.5 );
 				scene.add( pointLight );
 
-				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				material = new THREE.MeshPhongMaterial( { color: 0x7a7a7a, flatShading: true } );
+//clock color
+				clockMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				group = new THREE.Group();
 				group.position.y = 100;
@@ -93,12 +100,15 @@
 				} );
 
 				const plane = new THREE.Mesh(
-					new THREE.PlaneGeometry( 10000, 10000 ),
+					new THREE.PlaneGeometry( 500, 500 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
-				plane.position.y = 100;
+				plane.position.y = 0;
 				plane.rotation.x = - Math.PI / 2;
-				scene.add( plane );
+				//scene.add( plane );
+				group.add( plane );
+//clock
+				createClock();
 
 				// RENDERER
 
@@ -202,9 +212,9 @@
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
-				textMesh1.position.z = 0;
+				textMesh1.position.z = 100;
 
-				textMesh1.rotation.x = 0;
+				textMesh1.rotation.x = - Math.PI / 2;
 				textMesh1.rotation.y = Math.PI * 2;
 
 				group.add( textMesh1 );
@@ -222,6 +232,31 @@
 
 					group.add( textMesh2 );
 
+				}
+// clock
+				for (let i = 0; i < hours.length; i++) {
+					hoursGeo = new THREE.TextGeometry( hours[i], {
+
+						font: font,
+						size: 14,
+						height: 2,
+						curveSegments: curveSegments,
+
+						bevelThickness: bevelThickness,
+						bevelSize: bevelSize,
+						bevelEnabled: true
+
+					} );
+
+					hoursGeo.computeBoundingBox();
+					hoursGeo.computeVertexNormals();
+
+					hoursMesh = new THREE.Mesh( hoursGeo, clockMaterial );
+					hoursMesh.position.x = -7 + hoursX[i] * 40;
+					hoursMesh.position.y = 110 + hoursY[i] * 40;
+					hoursMesh.position.z = 2;
+
+					group.add(hoursMesh);
 				}
 
 			}
@@ -280,6 +315,28 @@
 
 				renderer.render( scene, camera );
 
+			}
+//my function
+			function createClock() {
+				const clock = new THREE.Mesh(
+					new THREE.CircleGeometry(100, 64),
+					new THREE.MeshBasicMaterial( { color: 0x00ffff, opacity: 0.5, transparent: true } )
+				);
+				clock.position.x = 0;
+				clock.position.y = 116;
+				clock.position.z = 0;
+				group.add(clock);
+
+				for (let i = 0; i < hours.length; i++) {
+					var circle = new THREE.Mesh(
+						new THREE.CircleGeometry(14, 32),
+						new THREE.MeshBasicMaterial( { color: 0x00e393 , opacity: 0.7, transparent: true } )
+					);
+					circle.position.x = 3 + hoursX[i] * 40;
+					circle.position.y = 116 + hoursY[i] * 40;
+					circle.position.z = 1;
+					group.add( circle );
+				}
 			}
 
 		</script>
